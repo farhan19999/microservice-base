@@ -6,11 +6,12 @@ class Workspace {
   constructor() {}
   query = async (sqlQuery, params) => {
     try {
-      let PGUSER = "quqpqwvm";
-      let PGHOST = "silly.db.elephantsql.com";
-      let PGPASSWORD = "rRsMidazAT30xLyQO0uyn3jOl37YGMys";
-      let PGDATABASE = "quqpqwvm";
-      let PGPORT = "5432";
+      //get data from .env
+      let PGUSER = process.env.PGUSER;
+      let PGHOST = process.env.PGHOST;
+      let PGPASSWORD = process.env.PGPASSWORD;
+      let PGDATABASE = process.env.PGDATABASE;
+      let PGPORT = process.env.PGPORT;
       const pool = new Pool({
         user: PGUSER,
         host: PGHOST,
@@ -31,7 +32,7 @@ class Workspace {
         client.release();
       }
       await pool.end();
-      return result_obj;
+      return result_obj.data;
     } catch (error) {
       console.log(error);
       return {
