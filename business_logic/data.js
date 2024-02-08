@@ -1,5 +1,13 @@
 // dummy data
 // now generate a data that has places of bangladesh and popular tourist spots in that place
+
+book_data = [
+  {
+    name: "The Alchemist",
+    author: "Paulo Coelho"
+  }
+]
+
 data = [
   {
     place: "Dhaka",
@@ -114,4 +122,4 @@ data = [
     ],
   },
 ];
-module.exports = data;
+module.exports = book_data;
