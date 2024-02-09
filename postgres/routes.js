@@ -37,18 +37,19 @@ class RouteWorkspace extends Workspace {
     });
     // now set matrix value for row all_trains_from_start and column all_stations to the differnnce of fare from all stations - start
     all_stations.forEach((station) => {
-      matrix[all_trains_from_start.station_id][station.station_id] =
-        station.fare - all_trains_from_start.fare;
+      matrix[parseInt(all_trains_from_start.station_id)][
+        parseInt(station.station_id)
+      ] = station.fare - all_trains_from_start.fare;
     });
     //call recursively for all the stations
     all_stations.forEach((station) => {
-      addEdge(station, to);
+      addEdge(station.station_id, to);
     });
   };
   optimalRoute = async function (from, to, optimize_by) {
     if (optimize_by === "cost") {
       initialize();
-      addEdge(from, to);
+      addEdge(parseInt(from), parseInt(to));
       // now run dijkstra's algorithm to find the optimal route
       let dist = new Array(100);
       let visited = new Array(100);

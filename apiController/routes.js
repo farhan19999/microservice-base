@@ -17,8 +17,8 @@ class RouteController {
     const result = await routeWorkspace.getOptimalRoute(from, to, optimize_by);
     if (!result.success)
       return res
-        .status(500)
-        .json({ code: "E0001", description: "Internal Error" });
+        .status(403)
+        .json({message: `no routes available from station: ${from} to station: ${to}` });
     else {
       console.log("optimal route fetched");
       return res.status(200).json(result.data);
