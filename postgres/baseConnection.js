@@ -28,6 +28,7 @@ class Workspace {
         const res = await client.query(sqlQuery, params);
         result_obj.success = true;
         result_obj.data = res.rows;
+        result_obj.rowCount = res.rowCount;
       } finally {
         client.release();
       }

@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 const usersroute = require("./routes/users");
 const stationsroute = require("./routes/stations");
 const trainsroute = require("./routes/trains");
+const routesRoute = require('./routes/routes');
 
 //running app
 const app = express();
@@ -14,9 +15,11 @@ app.use(express.json());
 dotenv.config();
 
 //middlewares
-app.use("/api/users",usersroute);
-app.use("/api/stations",stationsroute);
-app.use("/api/trains",trainsroute);
+app.use("/api/users", usersroute);
+app.use("/api/stations", stationsroute);
+app.use("/api/trains", trainsroute);
+app.use("/api/wallets", usersroute);
+app.use('/api/routes', routesRoute);
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`backend server is running at port ${process.env.PORT}`);
