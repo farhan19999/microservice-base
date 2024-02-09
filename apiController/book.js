@@ -1,46 +1,20 @@
-const BookWorkspace = require('../postgres/book').BookWorkspace;
+const BookWorkspace = require("../postgres/book").BookWorkspace;
 const bookWorkspace = new BookWorkspace();
 
 class BookController {
-    async getBooks(req, res) {
-        try {
-            const books = await bookWorkspace.getBooks();
-            res.status(300).json(books);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+  constructor() {}
 
-    async addBook(req, res) {
-        try {
-            const book = req.body;
-            const newBook = await bookWorkspace.addBook(book);
-            res.status(201).json(newBook);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+  allbooks = async (req, res, next) => {
+    const result = await bookWorkspace.getAllBooks();
+  
+    return res.status(200).json(result);
+  };
 
-    async updateBook(req, res) {
-        try {
-            const id = req.params.id;
-            const book = req.body;
-            const updatedBook = await bookWorkspace.updateBook(id, book);
-            res.status(200).json(updatedBook);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
-
-    async deleteBook(req, res) {
-        try {
-            const id = req.params.id;
-            await bookWorkspace.deleteBook(id);
-            res.status(204).end();
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+  getBookById = async (req, res, next) => {
+    const id = req.body.id;
+    const result = await bookWorkspace.getBookById(id);
+    return res.status(200).json(result);
+  }
 }
 
-module.exports = { BookController };
+exports.BookController = BookController;
