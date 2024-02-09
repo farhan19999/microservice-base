@@ -3,7 +3,6 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 // routes
-// const plannerRoute = require("./routes/planner");
 const bookRoute = require("./routes/book");
 
 //running app
@@ -13,9 +12,7 @@ app.use(express.json());
 dotenv.config();
 
 //middlewares
-// app.use("/api/planner", plannerRoute);
 app.use("/api/book", bookRoute);
-app.use('')
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`backend server is running at port ${process.env.PORT}`);
