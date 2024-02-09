@@ -24,7 +24,7 @@ app.use('/api/routes', routesRoute);
 app.use("/api/users",usersroute);
 app.use("/api/stations",stationsroute);
 app.use("/api/trains",trainsroute);
-app.use("api/tickets",ticketsroute);
+app.use("/api/tickets",ticketsroute);
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`backend server is running at port ${process.env.PORT}`);

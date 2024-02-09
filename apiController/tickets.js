@@ -1,17 +1,19 @@
 const TicketWorkSpace = require("../postgres/tickets").TicketWorkspace;
 const ticketWorkspace = new TicketWorkSpace();
 
+getNextStop = async (train_id, stop_id, stops) => {
+  for (let i = 0; i < stops.length; i++) {
+    if (stops[i].train_id == train_id && stops[i].stop_id == stop_id + 1) {
+      return stops[i];
+    }
+  }
+  return null;
+}
+
 class TicketController {
   constructor() {}
 
-  getNextStop = async (train_id, stop_id, stops) => {
-    for (let i = 0; i < stops.length; i++) {
-      if (stops[i].train_id == train_id && stops[i].stop_id == stop_id + 1) {
-        return stops[i];
-      }
-    }
-    return null;
-  }
+  
 
 
   purchaseTicket = async (req, res, next) => {
@@ -27,9 +29,11 @@ class TicketController {
     //stop id is the sequence number of the stop in the train's route, the train will go through the stations in the order of the stop_id
 
     
+    let route = [];
     for (let i = 0; i < stops.length; i++) {
-      let route = [];
       if (stops[i].station_id == station_from) {
+        //clear the route and start a new route
+        route = [];
         route.push(stops[i]);
         while (route[route.length - 1].station_id != station_to) {
           let next_stop = await getNextStop(route[route.length - 1].train_id, route[route.length - 1].stop_id, stops);
@@ -59,7 +63,13 @@ class TicketController {
     }
 
     let stations = [];
-    for (i = 0; i < route.length; i++) {
+    for (let i = 0; i < route.length; i++) {
+      //conver from hh:mm:ss to hh:mm
+      if (route[i].departure_time !== null) {
+        route[i].departure_time = route[i].departure_time.substring(0, 5);
+      }
+      if (route[i].arrival_time !== null)
+        route[i].arrival_time = route[i].arrival_time.substring(0, 5);
       let station_obj = {
         station_id: route[i].station_id,
         train_id: route[i].train_id,
@@ -74,6 +84,9 @@ class TicketController {
         stations[i].departure_time = null;
       }
     }
+
+    //update the balance in the wallet
+    await ticketWorkspace.updateBalance(wallet_id, balance - total_fare);
     let return_obj = {
       ticket_id: 101,
       balance: balance - total_fare,

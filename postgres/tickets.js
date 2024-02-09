@@ -13,10 +13,17 @@ class TicketWorkspace extends Workspace {
   }
 
   getBalance = async function (wallet_id) {
-    const query = `SELECT balance FROM user WHERE user_id = $1`;
+    const query = `SELECT balance FROM "user" WHERE user_id = $1`;
     const params = [wallet_id];
     const result = await this.query(query, params);
+    console.log(result.data[0].balance);
     return result.data[0].balance;
+  }
+
+  updateBalance = async function (wallet_id, amount) {
+    const query = `UPDATE "user" SET balance = $1 WHERE user_id = $2`;
+    const params = [amount, wallet_id];
+    await this.query(query, params);
   }
 
 
