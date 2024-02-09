@@ -17,7 +17,7 @@ dotenv.config();
 
 //middlewares
 app.use("/api/users", usersroute);
-app.use("/api/stations", stationsroute);
+app.use("/api/stations", stationsroute); 
 app.use("/api/trains", trainsroute);
 app.use("/api/wallets", usersroute);
 app.use('/api/routes', routesRoute);

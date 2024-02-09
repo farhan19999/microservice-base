@@ -1,4 +1,4 @@
-const TicketWorkSpace = require("../postgres/stations").TicketWorkSpace;
+const TicketWorkSpace = require("../postgres/tickets").TicketWorkspace;
 const ticketWorkspace = new TicketWorkSpace();
 
 class TicketController {
@@ -13,7 +13,7 @@ class TicketController {
     else {
       console.log("stations fetched");
       const return_obj = {
-        stations : result.data
+        stations: result.data,
       };
       return res.status(200).json(return_obj);
     }
@@ -21,19 +21,19 @@ class TicketController {
 
   findPath = (stops, station_from, station_to) => {
     //base case
-    if(station_from === station_to){
+    if (station_from === station_to) {
       return [station_to];
     }
     //recursive case
-    const next_stops = stops.filter(stop => stop.station_id === station_from);
-    for(const stop of next_stops){
+    const next_stops = stops.filter((stop) => stop.station_id === station_from);
+    for (const stop of next_stops) {
       const path = this.findPath(stops, stop.station_id, station_to);
-      if(path.length > 0){
+      if (path.length > 0) {
         return [station_from, ...path];
       }
     }
     return [];
-  }
+  };
 
   purchaseTicket = async (req, res, next) => {
     const wallet_id = req.body.wallet_id;
@@ -51,19 +51,14 @@ class TicketController {
     //i will use a recursive function to find the path, the base case is when the station_from is the same as station_to
     //the recursive function will return the path from station_from to station_to, if there is no path, it will return an empty array
     const path = this.findPath(stops, station_from, station_to);
-    if(path.length === 0){
-      return res.status(400).json({code: "E0002", description: "No path found"});
+    if (path.length === 0) {
+      return res
+        .status(400)
+        .json({ code: "E0002", description: "No path found" });
     }
     //now i have to calculate the fare
     const fare = this.calculateFare(path, stops);
-
-
-
-
-
-
-  }
-
+  };
 }
 
 exports.TicketController = TicketController;
