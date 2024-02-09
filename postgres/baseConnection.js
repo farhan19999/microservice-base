@@ -32,7 +32,7 @@ class Workspace {
         client.release();
       }
       await pool.end();
-      return result_obj.data;
+      return result_obj;
     } catch (error) {
       console.log(error);
       return {
