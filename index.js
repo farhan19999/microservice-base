@@ -14,6 +14,8 @@ dotenv.config();
 //middlewares
 app.use("/api/book", bookRoute);
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
   console.log(`backend server is running at port ${process.env.PORT}`);
 });
+
+module.exports = server;
