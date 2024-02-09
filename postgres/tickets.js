@@ -12,6 +12,13 @@ class TicketWorkspace extends Workspace {
     return result.data;
   }
 
+  getBalance = async function (wallet_id) {
+    const query = `SELECT balance FROM user WHERE user_id = $1`;
+    const params = [wallet_id];
+    const result = await this.query(query, params);
+    return result.data[0].balance;
+  }
+
 
 }
 exports.TicketWorkspace = TicketWorkspace;

@@ -1,39 +1,18 @@
-const TicketWorkSpace = require("../postgres/stations").TicketWorkSpace;
+const TicketWorkSpace = require("../postgres/tickets").TicketWorkspace;
 const ticketWorkspace = new TicketWorkSpace();
 
 class TicketController {
   constructor() {}
 
-  allStations = async (req, res, next) => {
-    const result = await stationWorkspace.getAllStations();
-    if (!result.success)
-      return res
-        .status(500)
-        .json({ code: "E0001", description: "Internal Error" });
-    else {
-      console.log("stations fetched");
-      const return_obj = {
-        stations : result.data
-      };
-      return res.status(200).json(return_obj);
-    }
-  };
-
-  findPath = (stops, station_from, station_to) => {
-    //base case
-    if(station_from === station_to){
-      return [station_to];
-    }
-    //recursive case
-    const next_stops = stops.filter(stop => stop.station_id === station_from);
-    for(const stop of next_stops){
-      const path = this.findPath(stops, stop.station_id, station_to);
-      if(path.length > 0){
-        return [station_from, ...path];
+  getNextStop = async (train_id, stop_id, stops) => {
+    for (let i = 0; i < stops.length; i++) {
+      if (stops[i].train_id == train_id && stops[i].stop_id == stop_id + 1) {
+        return stops[i];
       }
     }
-    return [];
+    return null;
   }
+
 
   purchaseTicket = async (req, res, next) => {
     const wallet_id = req.body.wallet_id;
@@ -47,23 +26,62 @@ class TicketController {
     //  {stop_id, station_id, train_id, departure_time: hh:mm:ss, arrival_time: hh:mm:ss, fare},
     //stop id is the sequence number of the stop in the train's route, the train will go through the stations in the order of the stop_id
 
-    //now i have to find a path from station_from to station_to, use the stop sequence , arrival_time and departure_time to find the path
-    //i will use a recursive function to find the path, the base case is when the station_from is the same as station_to
-    //the recursive function will return the path from station_from to station_to, if there is no path, it will return an empty array
-    const path = this.findPath(stops, station_from, station_to);
-    if(path.length === 0){
-      return res.status(400).json({code: "E0002", description: "No path found"});
+    
+    for (let i = 0; i < stops.length; i++) {
+      let route = [];
+      if (stops[i].station_id == station_from) {
+        route.push(stops[i]);
+        while (route[route.length - 1].station_id != station_to) {
+          let next_stop = await getNextStop(route[route.length - 1].train_id, route[route.length - 1].stop_id, stops);
+          if (next_stop == null) {
+            break;
+          }
+          route.push(next_stop);
+        }
+        if(route[route.length - 1].station_id == station_to){
+          break;
+        }
+      }
     }
-    //now i have to calculate the fare
-    const fare = this.calculateFare(path, stops);
 
+    let total_fare = 0;
+    for (let i = 0; i < route.length; i++) {
+      total_fare += route[i].fare;
+    }
 
+    const balance = await ticketWorkspace.getBalance(wallet_id);
 
+    if (balance < total_fare) {
+      return res.status(402).json({ message: "recharge amount: " + (total_fare - balance) + " to purchase the ticket"});
+    }
+    if (route.length == 0 || route[route.length - 1].station_id != station_to) {
+      return res.status(403).json({ message: "no ticket available for station: " + station_from + " to station: " + station_to});
+    }
 
-
-
+    let stations = [];
+    for (i = 0; i < route.length; i++) {
+      let station_obj = {
+        station_id: route[i].station_id,
+        train_id: route[i].train_id,
+        departure_time: route[i].departure_time,
+        arrival_time: route[i].arrival_time
+      }
+      stations.push(station_obj);
+      if (i == 0) {
+        stations[i].arrival_time = null;
+      }
+      if (i == route.length - 1) {
+        stations[i].departure_time = null;
+      }
+    }
+    let return_obj = {
+      ticket_id: 101,
+      balance: balance - total_fare,
+      wallet_id: wallet_id,
+      stations: stations
+    };
+    return res.status(201).json(return_obj);
   }
 
 }
-
 exports.TicketController = TicketController;
